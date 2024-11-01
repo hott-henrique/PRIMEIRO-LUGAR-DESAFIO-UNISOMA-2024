@@ -1,6 +1,6 @@
 # Projeto de Otimização de Consultas - Instituto Borboleta Azul
 
-**Equipe Vencedora: [@YanAndrade69](https://github.com/YanAndrade69), [@guibitten03](https://github.com/guibitten03) e [@hott-henriquee](https://github.com/hott-henrique) .**
+**Equipe Vencedora: [@YanAndrade61](https://github.com/YanAndrade61), [@guibitten03](https://github.com/guibitten03) e [@hott-henrique](https://github.com/hott-henrique) .**
 
 ## Executando
 ```bash
