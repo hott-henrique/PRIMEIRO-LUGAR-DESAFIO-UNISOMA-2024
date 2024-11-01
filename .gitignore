@@ -1,0 +1,6 @@
+build/
+dist/
+examples/
+.ignored/
+
+__pycache__/
