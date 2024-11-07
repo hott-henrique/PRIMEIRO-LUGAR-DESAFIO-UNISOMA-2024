@@ -46,6 +46,15 @@ class Model(object):
                 x1[m, p, d, h, l] for p in P for d in D for h in H for l in L
             ) <= disp_m[m], f"disp_medico_{m}"
 
+        # INCLUDE
+        # DESCRIPTION: Doctor's just one attends in each day-hour.
+        for m in M:
+            for d in D:
+                for h in H:
+                    prob += pulp.lpSum(
+                        x1[m, p, d, h, l] for p in P for l in L
+                    ) <= 1, f"max_consultas_medico_{m}_{d}_{h}"
+
         # DESCRIPTION: Each patient can consult a maximum of once per week.
         for p in P:
             prob += (
@@ -60,7 +69,7 @@ class Model(object):
 
         # DESCRIPTION:  Doctor's available schedule.
         for m, p, d, h, l in comb:
-            if dispon_m_d_h[m][d][h]:
+            if dispon_m_d_h[m][d][h] == 0: #CHANGE
                 prob += (x1[m, p, d, h, l] == 0, f"Horario_disponivel_medico_{m}_{p}_{d}_{h}_{l}")
 
         # DESCRIPTION: Doctor's available location.
