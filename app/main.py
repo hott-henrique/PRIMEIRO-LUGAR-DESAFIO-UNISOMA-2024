@@ -160,8 +160,6 @@ def main():
             logger.info(f"O carregamento falhou, por favor verifique se o arquivo excel está corrompido.")
             progress_bar["value"] = 0
         except Exception as e:
-            import traceback
-            logger.debug(traceback.format_exc())
             logger.info(f"O processamento falhou, por favor verifique os erros.")
             progress_bar["value"] = 0
 
@@ -170,6 +168,8 @@ def main():
             save_errors(loader.file_path, loader.errors, logger=logger)
         except zipfile.BadZipFile as e:
             logger.info(f"O programa falhou ao salvar os errors, por favor verifique se o arquivo excel está corrompido.")
+
+        tkinter.messagebox.showinfo("Agendamento concluído", "O agendamento foi finalizado, o programa pode ser finalizado.")
 
         proccess_btn["state"] = "normal"
         window.update()
