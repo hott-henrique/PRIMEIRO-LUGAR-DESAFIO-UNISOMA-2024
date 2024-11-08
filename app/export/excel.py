@@ -38,8 +38,10 @@ def save_output(file_path: str, response: dict, solution: np.ndarray, logger: lo
     for row in solution:
         new_row = list()
 
-        new_row.append(response['doctor_names'][row[0]])
-        new_row.append(response['patient_names'][row[1]])
+        # ===================================================
+        new_row.append(response['patient_names'][row[0]])
+        new_row.append(response['doctor_names'][row[1]])
+        # ===================================================
         new_row.append(days_map[row[2]])
         new_row.append(hour_map[row[3]])
         new_row.append(response["local_names"][row[4]])

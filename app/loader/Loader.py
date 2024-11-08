@@ -37,7 +37,7 @@ class Loader(object):
         response['disp_m'] = disp_m_response[2]
         response['competence_m_p'] = competence_m_p_response[2]
         response['local_m_l'] = local_m_l_response[2]
-        response['local_p_l_d'] = self.create_local_p_l_d(data['LocalPaciente'])
+        response['local_p_l_d'] = self.create_local_p_l_d(data['LocalPaciente'], data['IdadePaciente'])
         response['dispon_p_d_h'] = self.create_dispon_p_d_h(data['DisponPaciente'])
         response['dispon_m_d_h'] = self.create_dispon_m_d_h(data['DisponProfissional'])
 
@@ -177,9 +177,13 @@ class Loader(object):
 
         return local_index, local_names, local_m_l
 
-    def create_local_p_l_d(self, local_patient: pd.DataFrame):
+    # ===================================================
+    def create_local_p_l_d(self, local_patient: pd.DataFrame, patient_info: pd.DataFrame):
+    # ===================================================
         local_header = [ x.strip() for x in local_patient.columns ]
         local_values = local_patient.values
+        patient_header = [ x.strip() for x in patient_info.columns ]
+        patient_values = patient_info.values
 
         if 'paciente' not in local_header:
             self.missing_column("LocalPaciente", "paciente")
@@ -189,6 +193,14 @@ class Loader(object):
 
         if 'virtual_epsi' not in local_header:
             self.missing_column("LocalPaciente", "virtual_epsi")
+
+    # ===================================================
+        if 'paciente' not in patient_header:
+            self.missing_column("IdadePaciente", "paciente")
+
+        if 'idade' not in patient_header:
+            self.missing_column("IdadePaciente", "idade")
+    # ===================================================
 
         if (len(local_values) % WEEK_SIZE) != 0:
             self.error_missing_value("LocalPaciente", f"É necessário que exista um dia da semana para cada paciente.")
@@ -213,6 +225,11 @@ class Loader(object):
                     disp_in_week = True
 
                 local_p_l_d[patient_index][l][d] = 1 if row[(l + 2)] != 0 else 0
+
+                # ===================================================
+                if (l == 0) and (int(patient_values[patient_index][1]) < 12):
+                    local_p_l_d[patient_index][l][d] = 0
+                # ===================================================
 
             disponible[patient_name].append(disp_in_week)
 
