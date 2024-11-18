@@ -1,5 +1,6 @@
 import collections
 import datetime
+import json
 import logging
 
 import numpy as np
@@ -11,6 +12,12 @@ import openpyxl.chart.label
 import openpyxl.chart.legend
 import openpyxl.chart.text
 
+class NumpyEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, np.ndarray):
+            return "NUMPY ARRAY - TOO BIG TO PRINT - EDIT THE CODE TO SEE."
+            return str(o.tolist())
+        return super().default(o)
 
 def save_errors(file_path: str, errors: list, logger: logging.Logger = logging.getLogger()):
     logger.debug(f"errors: {errors}")
@@ -35,12 +42,14 @@ def save_output(file_path: str, response: dict, solution: np.ndarray, logger: lo
     days_map = { i: day for i, day in enumerate([ "seg", "ter", "qua", "qui", "sex", "sab" ]) }
     hour_map = { i: hour for i, hour in enumerate([ "hr_" + str(x + 8) for x in range(13) ]) }
 
+    logger.debug(json.dumps(response, indent=2, ensure_ascii=False, skipkeys=True, cls=NumpyEncoder))
+
     for row in solution:
         new_row = list()
 
         # ===================================================
-        new_row.append(response['patient_names'][row[0]])
-        new_row.append(response['doctor_names'][row[1]])
+        new_row.append(response['patient_names'][row[1]])
+        new_row.append(response['doctor_names'][row[0]])
         # ===================================================
         new_row.append(days_map[row[2]])
         new_row.append(hour_map[row[3]])

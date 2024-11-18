@@ -160,7 +160,11 @@ def main():
             logger.info(f"O carregamento falhou, por favor verifique se o arquivo excel está corrompido.")
             progress_bar["value"] = 0
         except Exception as e:
+            import traceback
+            logger.debug(traceback.format_exc())
+
             logger.info(f"O processamento falhou, por favor verifique os erros.")
+
             progress_bar["value"] = 0
 
         try:
