@@ -1,5 +1,7 @@
 import pandas as pd
 import numpy as np
+from collections import defaultdict
+
 
 import logging
 
@@ -65,8 +67,68 @@ class Loader(object):
         data = {
             sheet_name: pd.read_excel(self.file_path, sheet_name=sheet_name).fillna(0) for sheet_name in default_sheets
         }
+        
+        for sheet_name, sheet_data in data.items():
+            column_name = 'paciente' if 'Paciente' in sheet_name else 'profissional'
+            data[sheet_name] = self.before_verify_duplicate(sheet_data, column_name)
+            data[sheet_name] = self.verify_duplicate(data[sheet_name], sheet_name, column_name)
+            data[sheet_name] = self.after_verify_duplicate(sheet_data, column_name)
+            print(data[sheet_name].head(8))
+
 
         return data
+
+
+    def before_verify_duplicate(self, data: pd.DataFrame, column_name: str):
+
+        current_name = None
+        idx = 0
+        new_column = []
+        for _, row in data.iterrows():
+            if row[column_name] != 0:
+                current_name = row[column_name]
+                idx = 0
+                new_column.append(current_name)
+            else:
+                new_column.append(current_name + "#" + str(idx))
+                idx += 1
+
+        data[column_name] = new_column
+
+        return data
+
+    def verify_duplicate(self, data: pd.DataFrame, sheet_name: str, column_name: str):
+
+        if column_name not in data.columns:
+            return data
+
+        duplicated = data[column_name][data[column_name].duplicated(keep=False)]    
+        
+        data = data.drop_duplicates(subset=column_name, keep="first")
+
+        for name in duplicated.unique():
+            if "#" in name:
+                continue
+            self.warning_message(
+                sheet_name,
+                f"{column_name.capitalize()} {name} duplicado na tabela. Considerado apenas o primeiro."
+            )
+
+        return data
+
+    def after_verify_duplicate(self, data: pd.DataFrame, column_name: str):
+
+        new_column = []
+        for _, row in data.iterrows():
+            if "#" in row[column_name]:
+                new_column.append(0)
+            else:
+                new_column.append(row[column_name])
+
+        data[column_name] = new_column
+
+        return data
+
 
     def create_disp_m(self, professional_rule: pd.DataFrame):
         header = [ x.strip() for x in professional_rule.columns ]
@@ -91,7 +153,7 @@ class Loader(object):
             disp_m[i] = row[2]
 
             if not disp_m[i] or not isinstance(disp_m[i], (float, int)):
-                self.warning_missing_value(
+                self.warning_message(
                     "RegraProfissional",
                     f"Profissional {professional_map[i]} sem horário de disponibilidade. Não será alocado."
                 )
@@ -235,7 +297,7 @@ class Loader(object):
 
         for pa, disps in disponible.items():
             if not any(disps):
-                self.warning_missing_value("LocalPaciente", f"O paciente {pa} não possui locais disponíveis. Não será alocado.")
+                self.warning_message("LocalPaciente", f"O paciente {pa} não possui locais disponíveis. Não será alocado.")
 
         return local_p_l_d
 
@@ -282,7 +344,7 @@ class Loader(object):
 
         for pa, disps in disponible.items():
             if not any(disps):
-                self.warning_missing_value("DisponPaciente", f"O paciente {pa} não possui horas disponíveis. Não será alocado.")
+                self.warning_message("DisponPaciente", f"O paciente {pa} não possui horas disponíveis. Não será alocado.")
 
         return hour_p_d_h
 
@@ -329,7 +391,7 @@ class Loader(object):
 
         for pr, disps in disponible.items():
             if not any(disps):
-                self.warning_missing_value(
+                self.warning_message(
                     "DisponProfissional",
                     f"O profissional {pr} não possui horas disponíveis. Não será alocado."
                 )
@@ -350,7 +412,7 @@ class Loader(object):
             "message": message
         })
 
-    def warning_missing_value(self, table: str, message: str):
+    def warning_message(self, table: str, message: str):
         self.errors.append({
             "table": table,
             "type": "AVISO",
