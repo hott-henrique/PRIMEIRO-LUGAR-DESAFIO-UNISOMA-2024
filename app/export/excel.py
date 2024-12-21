@@ -23,21 +23,20 @@ def clear_past_output(file_path: str):
     workbook = openpyxl.load_workbook(file_path)
 
     if "Inconsistência" in workbook.sheetnames:
-        workbook.remove_sheet(workbook["Inconsistência"])
+        sheet = workbook["Inconsistência"]
+        sheet.delete_rows(idx=2, amount=sheet.max_row - 1)
 
     if "Agendamento" in workbook.sheetnames:
-        workbook.remove_sheet(workbook["Agendamento"])
+        sheet = workbook["Agendamento"]
+        sheet.delete_rows(idx=2, amount=sheet.max_row - 1)
 
     if "Análise" in workbook.sheetnames:
-        workbook.remove_sheet(workbook["Análise"])
+        sheet = workbook["Análise"]
+        sheet.delete_rows(idx=2, amount=sheet.max_row - 1)
 
     if "Solução" in workbook.sheetnames:
-        workbook.remove_sheet(workbook["Solução"])
-
-    workbook.create_sheet(title="Inconsistência")
-    workbook.create_sheet(title="Agendamento")
-    workbook.create_sheet(title="Análise")
-    workbook.create_sheet(title="Solução")
+        sheet = workbook["Solução"]
+        sheet.delete_rows(idx=2, amount=sheet.max_row - 1)
 
     workbook.save(file_path)
 
