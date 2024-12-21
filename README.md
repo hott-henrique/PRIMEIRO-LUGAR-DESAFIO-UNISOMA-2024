@@ -11,3 +11,8 @@ $ python3 -m app.main
 ```bash
 $ pyinstaller -y main.spec
 ```
+
+## Acesso ao executavel
+```bash
+https://drive.google.com/file/d/1XeJ7WXsIzKlfEDHnF25a5jE3DCaeX0nr/view?usp=drive_link
+```
