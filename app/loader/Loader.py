@@ -67,14 +67,12 @@ class Loader(object):
         data = {
             sheet_name: pd.read_excel(self.file_path, sheet_name=sheet_name).fillna(0) for sheet_name in default_sheets
         }
-        
+
         for sheet_name, sheet_data in data.items():
             column_name = 'paciente' if 'Paciente' in sheet_name else 'profissional'
             data[sheet_name] = self.before_verify_duplicate(sheet_data, column_name)
             data[sheet_name] = self.verify_duplicate(data[sheet_name], sheet_name, column_name)
             data[sheet_name] = self.after_verify_duplicate(sheet_data, column_name)
-            print(data[sheet_name].head(8))
-
 
         return data
 
@@ -102,8 +100,8 @@ class Loader(object):
         if column_name not in data.columns:
             return data
 
-        duplicated = data[column_name][data[column_name].duplicated(keep=False)]    
-        
+        duplicated = data[column_name][data[column_name].duplicated(keep=False)]
+
         data = data.drop_duplicates(subset=column_name, keep="first")
 
         for name in duplicated.unique():

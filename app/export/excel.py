@@ -19,6 +19,28 @@ class NumpyEncoder(json.JSONEncoder):
             return str(o.tolist())
         return super().default(o)
 
+def clear_past_output(file_path: str):
+    workbook = openpyxl.load_workbook(file_path)
+
+    if "Inconsistência" in workbook.sheetnames:
+        workbook.remove_sheet(workbook["Inconsistência"])
+
+    if "Agendamento" in workbook.sheetnames:
+        workbook.remove_sheet(workbook["Agendamento"])
+
+    if "Análise" in workbook.sheetnames:
+        workbook.remove_sheet(workbook["Análise"])
+
+    if "Solução" in workbook.sheetnames:
+        workbook.remove_sheet(workbook["Solução"])
+
+    workbook.create_sheet(title="Inconsistência")
+    workbook.create_sheet(title="Agendamento")
+    workbook.create_sheet(title="Análise")
+    workbook.create_sheet(title="Solução")
+
+    workbook.save(file_path)
+
 def save_errors(file_path: str, errors: list, logger: logging.Logger = logging.getLogger()):
     logger.debug(f"errors: {errors}")
 
@@ -201,12 +223,6 @@ def plot(sheet, cell: str, data: list[tuple[str, int]], base_row: int, title: st
                                               max_row=base_row + len(data))
 
     chart = openpyxl.chart.BarChart()
-
-    # from openpyxl.chart.label import DataLabelList, DataLabel
-    # from openpyxl.chart.text import RichText
-
-    # chart.dataLabels = DataLabelList((DataLabel(0, txPr=RichText(p="Receba")), ))
-    # chart.dataLabels.showVal = True
 
     chart.add_data(data_reference, from_rows=True, titles_from_data=True)
 

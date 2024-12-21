@@ -18,7 +18,7 @@ import pulp
 
 from app.loader.Loader import Loader
 from app.model.Model import Model
-from app.export.excel import save_errors, save_output
+from app.export.excel import save_errors, save_output, clear_past_output
 
 
 class InfiniteThread(threading.Thread):
@@ -57,7 +57,7 @@ def create_logger(text: tk.Text, fmt: str = '%(asctime)s: %(message)s'):
     handler.setFormatter(formatter)
 
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     logger.addHandler(handler)
 
     return logger
@@ -120,6 +120,8 @@ def main():
         progress_bar["value"] = 1
         window.update()
 
+        clear_past_output(loader.file_path)
+
         logger.info(f"Carregando arquivo: {loader.file_path}")
 
         try:
@@ -128,7 +130,7 @@ def main():
             progress_bar["value"] = 2
             window.update()
 
-            logger.info(f"Realizando agendamento, este processo pode levar algum tempo, por favor, aguarde.")
+            logger.info("Realizando agendamento, este processo pode levar algum tempo, por favor, aguarde.")
 
             model = Model(logger=logger)
 
@@ -148,7 +150,7 @@ def main():
             logger.debug(solution)
 
             if status == "Optimal":
-                logger.info(f"Salvando resultados.")
+                logger.info("Salvando resultados.")
 
                 save_output(loader.file_path, data, solution, logger=logger)
 
@@ -156,22 +158,22 @@ def main():
                 window.update()
 
             progress_bar["value"] = 4
-        except zipfile.BadZipFile as e:
-            logger.info(f"O carregamento falhou, por favor verifique se o arquivo excel está corrompido.")
+        except zipfile.BadZipFile:
+            logger.info("O carregamento falhou, por favor verifique se o arquivo excel está corrompido.")
             progress_bar["value"] = 0
-        except Exception as e:
+        except Exception:
             import traceback
             logger.debug(traceback.format_exc())
 
-            logger.info(f"O processamento falhou, por favor verifique os erros.")
+            logger.info("O processamento falhou, por favor verifique os erros.")
 
             progress_bar["value"] = 0
 
         try:
-            logger.info(f"Salvando os erros.")
+            logger.info("Salvando os erros.")
             save_errors(loader.file_path, loader.errors, logger=logger)
-        except zipfile.BadZipFile as e:
-            logger.info(f"O programa falhou ao salvar os errors, por favor verifique se o arquivo excel está corrompido.")
+        except zipfile.BadZipFile:
+            logger.info("O programa falhou ao salvar os errors, por favor verifique se o arquivo excel está corrompido.")
 
         tkinter.messagebox.showinfo("Agendamento concluído", "O agendamento foi finalizado, o programa pode ser finalizado.")
 
