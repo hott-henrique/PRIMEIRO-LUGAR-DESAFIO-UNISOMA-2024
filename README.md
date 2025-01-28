@@ -14,5 +14,5 @@ $ pyinstaller -y main.spec
 
 ## Acesso ao executavel
 ```bash
-https://drive.google.com/file/d/1XeJ7WXsIzKlfEDHnF25a5jE3DCaeX0nr/view?usp=drive_link
+https://drive.google.com/file/d/1SCLbHsb6IPZt65jbG3Iiwvb60axwn31M/view?usp=sharing
 ```
