@@ -45,6 +45,9 @@ def save_errors(file_path: str, errors: list, logger: logging.Logger = logging.g
 
     workbook = openpyxl.load_workbook(file_path)
 
+    if "Inconsistência" not in workbook.sheetnames:
+        workbook.create_sheet("Inconsistência")
+
     sheet = workbook['Inconsistência']
 
     max_row = sheet.max_row
@@ -82,6 +85,9 @@ def save_output(file_path: str, response: dict, solution: np.ndarray, logger: lo
     logger.debug(solve_columns)
 
     workbook = openpyxl.load_workbook(file_path)
+
+    if "Solução" not in workbook.sheetnames:
+        workbook.create_sheet("Solução")
 
     sheet = workbook['Solução']
 

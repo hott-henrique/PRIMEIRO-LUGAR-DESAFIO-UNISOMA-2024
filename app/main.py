@@ -57,8 +57,9 @@ def create_logger(text: tk.Text, fmt: str = '%(asctime)s: %(message)s'):
     handler.setFormatter(formatter)
 
     logger = logging.getLogger()
-    logger.setLevel(logging.INFO)
     logger.addHandler(handler)
+
+    logger.setLevel(logging.INFO)
 
     return logger
 
@@ -147,6 +148,7 @@ def main():
             logger.info(f"Resultado do processamento: {map_status_to_message[status]}.")
             logger.info(f"Tempo gasto: {time_elapsed:.2f} segundos.")
 
+            logger.debug(status)
             logger.debug(solution)
 
             if status == "Optimal":
@@ -162,8 +164,7 @@ def main():
             logger.info("O carregamento falhou, por favor verifique se o arquivo excel está corrompido.")
             progress_bar["value"] = 0
         except Exception:
-            import traceback
-            logger.debug(traceback.format_exc())
+            logger.debug("ERROR:", exc_info=True)
 
             logger.info("O processamento falhou, por favor verifique os erros.")
 
